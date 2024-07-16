@@ -17,15 +17,24 @@ handle_request({Game_state, Events, Fel_pid}) ->
             Pid ! Game_state,
             {{Game_state, Events, Fel_pid},true};
         run ->
-            io:format("cel run ~p ~n ~p ~n",[Game_state, Events]),
-            {lists:foldl(fun(Event, Current_game_state) -> Event(Current_game_state) end, Game_state, Events), []},
+            io:format("cel run ~p ~p~n", [Game_state, Events]),
+            Current_state = lists:foldl(fun({_, Event}, Current_game_state) -> Event(Current_game_state) end, Game_state, Events),
+            io:format("Folded value ~p~n",[Current_state]),
+
+            
+
             Fel_pid ! {get_next, self()},
             receive
                 {add, New_events} ->
-                    self() ! run,
-                    {{Game_state, New_events, Fel_pid}, true};
+                    io:format("cel add command recieved ~p ~p~n", [Game_state, New_events]),
+                    case New_events of
+                        [] -> ok;
+                        _ -> self() ! run
+                    end,
+                    {{Current_state, New_events, Fel_pid}, true};
                 _ -> 
-                    {{Game_state, [], Fel_pid}, true}
+                    io:format("cel else ~p ~p~n", [Game_state, Events]),
+                    {{Current_state, [], Fel_pid}, true}
             end;
         stop -> {Game_state, false}
     end,
