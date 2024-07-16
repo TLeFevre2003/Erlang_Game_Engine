@@ -17,9 +17,13 @@ The Erlang Game Engine provides a framework for creating and managing game event
 To use the game engine, follow these steps:
 
 1. **Navigate to the Project Directory:**
-cd game_engine
+   ```
+    cd game_engine
+   ```
 2. **Start the Erlang Shell:**
-rebar3 shell
+   ```
+    rebar3 shell
+   ```
 
 3. **Start the Game Engine:**
 ```erlang
