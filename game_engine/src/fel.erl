@@ -22,7 +22,7 @@ handle_request({Events, Next_time}) ->
             % Add the sent event to the list
             {{[{Time, Fun}] ++ Events,Updated_time}, true};
         {add, Additional_events} when is_list(Additional_events) ->
-
+            % Find the smallest time in the new events
             [{First_time, _}|_] = Additional_events,
             Smallest_new_time = lists:foldl(fun({Time, _}, Accum) -> case Time < Accum of 
                                                                     true -> Time;
@@ -30,6 +30,7 @@ handle_request({Events, Next_time}) ->
                                                                 end
                                                             end,
                                                             First_time, Additional_events),
+                % Pick the smallest time to be next time
                 Updated_time = case First_time < Smallest_new_time of
                 true -> First_time;
                 _ -> Smallest_new_time
@@ -48,11 +49,12 @@ handle_request({Events, Next_time}) ->
                 Pid ! {add, Next_events},
                 io:format("fel sent events ~p ~n", [Next_events]),
 
-                % Find the time of the next soonest event
+                % Subract the sent events to find the remaining future events
                 Updated_events = lists:subtract(Events, Next_events),
 
                 io:format("Finding next state with updated events ~p ~n",[Updated_events]),
 
+                % Find the updated state
                 find_updated_state(Updated_events,Next_time);
 
 
@@ -75,14 +77,11 @@ find_updated_state(Updated_events, _) ->
                                             end,
                                             First_updated_time, Updated_events),
 
-                io:format("Next simulated time ~p ~n",[Updated_time]),
+    io:format("Next simulated time ~p ~n",[Updated_time]),
 
-                % Update the list of events by removing the sent events
-                
-
-                % Return the updated events and time
-                
-                {{Updated_events, Updated_time}, true}.
+    
+    % Return the updated events and time
+    {{Updated_events, Updated_time}, true}.
 
 
 
@@ -123,7 +122,3 @@ add_event(Pid,Fun, Time) ->
 -spec update_cel(pid()) -> ok.
 update_cel(Pid) ->
     Pid ! {get_next, self()}.
-
-                                                            
-
-    

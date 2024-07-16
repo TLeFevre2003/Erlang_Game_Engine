@@ -17,12 +17,12 @@ handle_request({Game_state, Events, Fel_pid}) ->
             Pid ! Game_state,
             {{Game_state, Events, Fel_pid},true};
         run ->
+            % Run all of Cel events
             io:format("cel run ~p ~p~n", [Game_state, Events]),
             Current_state = lists:foldl(fun({_, Event}, Current_game_state) -> Event(Current_game_state) end, Game_state, Events),
             io:format("Folded value ~p~n",[Current_state]),
 
-            
-
+            % Get the next events from the Fel
             Fel_pid ! {get_next, self()},
             receive
                 {add, New_events} ->
